@@ -3,8 +3,6 @@ name: Build 700TV APK
 on:
   push:
     branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
@@ -12,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
@@ -20,40 +18,46 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: gradle
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-
-      - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses || true
-
-      - name: Install required SDK components
-        run: |
-          sdkmanager "platforms;android-34" \
-                     "build-tools;34.0.0" \
-                     "platform-tools"
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
         with:
-          gradle-version: '8.4'
+          cmdline-tools-version: '11076708'
+          accept-android-sdk-licenses: true
+          packages: >-
+            platforms;android-34
+            build-tools;34.0.0
+            platform-tools
 
       - name: Create local.properties
         run: echo "sdk.dir=$ANDROID_HOME" > local.properties
 
-      - name: Cache Gradle packages
+      - name: Download Gradle Wrapper JAR
+        run: |
+          mkdir -p gradle/wrapper
+          curl -fsSL \
+            "https://services.gradle.org/distributions/gradle-8.4-bin.zip" \
+            -o /tmp/gradle.zip
+          unzip -p /tmp/gradle.zip \
+            "gradle-8.4/lib/gradle-wrapper.jar" \
+            > gradle/wrapper/gradle-wrapper.jar
+          echo "Wrapper JAR size: $(wc -c < gradle/wrapper/gradle-wrapper.jar)"
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Cache Gradle
         uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle-
 
       - name: Build Debug APK
-        run: gradle assembleDebug --stacktrace
-        env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
@@ -61,15 +65,3 @@ jobs:
           name: 700TV-debug-apk
           path: app/build/outputs/apk/debug/*.apk
           retention-days: 30
-
-      - name: Build Release APK
-        run: gradle assembleRelease --stacktrace
-        continue-on-error: true
-
-      - name: Upload Release APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: 700TV-release-apk
-          path: app/build/outputs/apk/release/*.apk
-          retention-days: 30
-        continue-on-error: true
