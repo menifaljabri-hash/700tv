@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">700TV</string>
+    <string name="tagline">أفضل تجربة مشاهدة</string>
+
+    <!-- Navigation -->
+    <string name="nav_live_tv">البث المباشر</string>
+    <string name="nav_movies">الأفلام</string>
+    <string name="nav_downloads">التنزيلات</string>
+    <string name="nav_settings">الإعدادات</string>
+
+    <!-- Home -->
+    <string name="loading">جاري التحميل…</string>
+    <string name="refresh">تحديث</string>
+    <string name="add_playlist">إضافة قائمة</string>
+    <string name="no_content">لا يوجد محتوى</string>
+    <string name="search_hint">البحث في القنوات…</string>
+
+    <!-- Playlist / Login -->
+    <string name="add_playlist_title">إضافة قائمة تشغيل</string>
+    <string name="playlist_name">اسم القائمة</string>
+    <string name="server_url">رابط السيرفر (مثال: http://server:8080)</string>
+    <string name="username">اسم المستخدم</string>
+    <string name="password">كلمة المرور</string>
+    <string name="m3u_url">رابط M3U</string>
+    <string name="connect">اتصال</string>
+    <string name="xtream_codes">Xtream Codes</string>
+    <string name="m3u_playlist">رابط M3U</string>
+    <string name="default_server">السيرفر الافتراضي (taame.live)</string>
+    <string name="use_default_server">استخدام السيرفر المُعد مسبقًا</string>
+
+    <!-- Player -->
+    <string name="back">رجوع</string>
+    <string name="play">تشغيل</string>
+    <string name="pause">إيقاف مؤقت</string>
+    <string name="rewind">10 ثوانٍ للخلف</string>
+    <string name="forward">10 ثوانٍ للأمام</string>
+
+    <!-- Downloads -->
+    <string name="downloads_title">التنزيلات</string>
+    <string name="download">تنزيل</string>
+    <string name="downloading">جاري التنزيل…</string>
+    <string name="download_complete">اكتمل التنزيل</string>
+    <string name="download_failed">فشل التنزيل</string>
+    <string name="delete_download">حذف</string>
+    <string name="play_offline">تشغيل بدون إنترنت</string>
+    <string name="storage_used">المساحة المستخدمة</string>
+    <string name="no_downloads">لا توجد تنزيلات بعد</string>
+    <string name="download_started">بدأ التنزيل</string>
+    <string name="confirm_delete">حذف هذا التنزيل؟</string>
+    <string name="cancel">إلغاء</string>
+    <string name="confirm">تأكيد</string>
+
+    <!-- Parental -->
+    <string name="enter_pin">أدخل رمز PIN</string>
+    <string name="wrong_pin">الرمز غير صحيح</string>
+    <string name="set_pin">تعيين رمز PIN</string>
+    <string name="parental_controls">الرقابة الأبوية</string>
+    <string name="pin_enabled">حماية بكلمة مرور</string>
+    <string name="lock_adult">قفل المحتوى للبالغين</string>
+
+    <!-- Settings -->
+    <string name="settings_title">الإعدادات</string>
+    <string name="language">اللغة</string>
+    <string name="language_english">English</string>
+    <string name="language_arabic">العربية</string>
+    <string name="about">حول التطبيق</string>
+    <string name="version">الإصدار</string>
+    <string name="manage_playlists">إدارة القوائم</string>
+    <string name="server_info">معلومات السيرفر</string>
+    <string name="account_status">حالة الحساب</string>
+    <string name="expiry_date">تاريخ الانتهاء</string>
+    <string name="max_connections">الحد الأقصى للاتصالات</string>
+    <string name="active">نشط</string>
+    <string name="expired">منتهي</string>
+</resources>

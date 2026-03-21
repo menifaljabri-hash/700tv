@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">700TV</string>
+    <string name="tagline">Best Viewing Experience</string>
+
+    <!-- Navigation -->
+    <string name="nav_live_tv">Live TV</string>
+    <string name="nav_movies">Movies</string>
+    <string name="nav_downloads">Downloads</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Home -->
+    <string name="loading">Loading…</string>
+    <string name="refresh">Refresh</string>
+    <string name="add_playlist">Add Playlist</string>
+    <string name="no_content">No content available</string>
+    <string name="search_hint">Search channels…</string>
+
+    <!-- Playlist / Login -->
+    <string name="add_playlist_title">Add Playlist</string>
+    <string name="playlist_name">Playlist Name</string>
+    <string name="server_url">Server URL (e.g. http://server:8080)</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="m3u_url">M3U URL</string>
+    <string name="connect">Connect</string>
+    <string name="xtream_codes">Xtream Codes</string>
+    <string name="m3u_playlist">M3U URL</string>
+    <string name="default_server">Default Server (taame.live)</string>
+    <string name="use_default_server">Use pre-configured server</string>
+
+    <!-- Player -->
+    <string name="back">Back</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="rewind">Rewind 10s</string>
+    <string name="forward">Forward 10s</string>
+
+    <!-- Downloads -->
+    <string name="downloads_title">Downloads</string>
+    <string name="download">Download</string>
+    <string name="downloading">Downloading…</string>
+    <string name="download_complete">Download complete</string>
+    <string name="download_failed">Download failed</string>
+    <string name="delete_download">Delete</string>
+    <string name="play_offline">Play Offline</string>
+    <string name="storage_used">Storage used</string>
+    <string name="no_downloads">No downloads yet</string>
+    <string name="download_started">Download started</string>
+    <string name="confirm_delete">Delete this download?</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+
+    <!-- Parental -->
+    <string name="enter_pin">Enter PIN</string>
+    <string name="wrong_pin">Incorrect PIN</string>
+    <string name="set_pin">Set PIN</string>
+    <string name="parental_controls">Parental Controls</string>
+    <string name="pin_enabled">PIN Protection</string>
+    <string name="lock_adult">Lock Adult Content</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="language">Language</string>
+    <string name="language_english">English</string>
+    <string name="language_arabic">العربية</string>
+    <string name="about">About</string>
+    <string name="version">Version</string>
+    <string name="manage_playlists">Manage Playlists</string>
+    <string name="server_info">Server Information</string>
+    <string name="account_status">Account Status</string>
+    <string name="expiry_date">Expiry Date</string>
+    <string name="max_connections">Max Connections</string>
+    <string name="active">Active</string>
+    <string name="expired">Expired</string>
+</resources>
