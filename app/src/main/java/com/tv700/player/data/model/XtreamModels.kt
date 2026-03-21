@@ -1,4 +1,4 @@
-package com.iptv.player.data.model
+package com.tv700.player.data.model
 
 import com.google.gson.annotations.SerializedName
 

@@ -1,112 +1,162 @@
-package com.iptv.player
+package com.tv700.player
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
 import androidx.navigation.navArgument
-import com.iptv.player.ui.home.HomeScreen
-import com.iptv.player.ui.login.AddPlaylistScreen
-import com.iptv.player.ui.parental.PinGateScreen
-import com.iptv.player.ui.player.PlayerScreen
-import com.iptv.player.ui.theme.IPTVTheme
+import com.tv700.player.data.locale.LanguageManager
+import com.tv700.player.ui.downloads.DownloadsScreen
+import com.tv700.player.ui.home.HomeScreen
+import com.tv700.player.ui.login.AddPlaylistScreen
+import com.tv700.player.ui.parental.PinGateScreen
+import com.tv700.player.ui.player.PlayerScreen
+import com.tv700.player.ui.settings.SettingsScreen
+import com.tv700.player.ui.splash.SplashScreen
+import com.tv700.player.ui.theme.TV700Theme
 import dagger.hilt.android.AndroidEntryPoint
 import java.net.URLDecoder
 import java.net.URLEncoder
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject lateinit var languageManager: LanguageManager
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(languageManager.applyLocale(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            IPTVTheme {
-                IPTVNavGraph()
+            TV700Theme {
+                TV700NavHost()
             }
         }
     }
 }
 
 object Routes {
-    const val HOME = "home"
+    const val SPLASH       = "splash"
+    const val HOME         = "home"
     const val ADD_PLAYLIST = "add_playlist"
-    const val PLAYER = "player/{streamUrl}/{title}"
-    const val PIN_GATE = "pin_gate/{returnRoute}"
+    const val DOWNLOADS    = "downloads"
+    const val SETTINGS     = "settings"
+    const val PLAYER       = "player/{streamUrl}/{title}"
+    const val PIN_GATE     = "pin_gate"
 
-    fun player(streamUrl: String, title: String): String {
-        val encoded = URLEncoder.encode(streamUrl, "UTF-8")
-        val encodedTitle = URLEncoder.encode(title, "UTF-8")
-        return "player/$encoded/$encodedTitle"
-    }
-
-    fun pinGate(returnRoute: String): String {
-        val encoded = URLEncoder.encode(returnRoute, "UTF-8")
-        return "pin_gate/$encoded"
-    }
+    fun player(url: String, title: String) =
+        "player/${URLEncoder.encode(url, "UTF-8")}/${URLEncoder.encode(title, "UTF-8")}"
 }
 
 @Composable
-fun IPTVNavGraph() {
+fun TV700NavHost() {
     val navController = rememberNavController()
+    val backstackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute   = backstackEntry?.destination?.route
 
-    NavHost(navController = navController, startDestination = Routes.HOME) {
+    val showBottomBar = currentRoute in listOf(Routes.HOME, Routes.DOWNLOADS, Routes.SETTINGS)
 
-        composable(Routes.HOME) {
-            HomeScreen(
-                onChannelClick = { channel ->
-                    navController.navigate(Routes.player(channel.streamUrl, channel.name))
-                },
-                onVodClick = { movie ->
-                    navController.navigate(Routes.player(movie.streamUrl, movie.name))
-                }
-            )
-        }
-
-        composable(Routes.ADD_PLAYLIST) {
-            AddPlaylistScreen(
-                onBack = { navController.popBackStack() },
-                onAdded = {
-                    navController.navigate(Routes.HOME) {
-                        popUpTo(Routes.HOME) { inclusive = true }
+    Scaffold(
+        bottomBar = {
+            if (showBottomBar) {
+                NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
+                    listOf(
+                        Triple(Routes.HOME,      Icons.Default.LiveTv,   R.string.nav_live_tv),
+                        Triple(Routes.DOWNLOADS, Icons.Default.Download, R.string.nav_downloads),
+                        Triple(Routes.SETTINGS,  Icons.Default.Settings, R.string.nav_settings)
+                    ).forEach { (route, icon, labelRes) ->
+                        val selected = currentRoute == route
+                        NavigationBarItem(
+                            selected = selected,
+                            onClick  = {
+                                navController.navigate(route) {
+                                    popUpTo(Routes.HOME) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState    = true
+                                }
+                            },
+                            icon  = { Icon(icon, contentDescription = null) },
+                            label = { Text(stringResource(labelRes)) }
+                        )
                     }
                 }
-            )
+            }
         }
+    ) { padding ->
+        Box(Modifier.padding(padding)) {
+            NavHost(navController, startDestination = Routes.SPLASH) {
 
-        composable(
-            route = Routes.PLAYER,
-            arguments = listOf(
-                navArgument("streamUrl") { type = NavType.StringType },
-                navArgument("title")     { type = NavType.StringType }
-            )
-        ) { backStack ->
-            val rawUrl   = backStack.arguments?.getString("streamUrl") ?: ""
-            val rawTitle = backStack.arguments?.getString("title") ?: ""
-            PlayerScreen(
-                streamUrl = URLDecoder.decode(rawUrl, "UTF-8"),
-                title     = URLDecoder.decode(rawTitle, "UTF-8"),
-                onBack    = { navController.popBackStack() }
-            )
-        }
+                composable(Routes.SPLASH) {
+                    SplashScreen(onFinished = {
+                        navController.navigate(Routes.HOME) {
+                            popUpTo(Routes.SPLASH) { inclusive = true }
+                        }
+                    })
+                }
 
-        composable(
-            route = Routes.PIN_GATE,
-            arguments = listOf(
-                navArgument("returnRoute") { type = NavType.StringType }
-            )
-        ) { backStack ->
-            val returnRoute = URLDecoder.decode(
-                backStack.arguments?.getString("returnRoute") ?: "", "UTF-8"
-            )
-            PinGateScreen(
-                onUnlocked = {
-                    navController.navigate(returnRoute) { popBackStack() }
-                },
-                onDismiss = { navController.popBackStack() }
-            )
+                composable(Routes.HOME) {
+                    HomeScreen(
+                        onChannelClick = { ch  -> navController.navigate(Routes.player(ch.streamUrl, ch.name)) },
+                        onVodClick     = { vod -> navController.navigate(Routes.player(vod.streamUrl, vod.name)) },
+                        onAddPlaylist  = { navController.navigate(Routes.ADD_PLAYLIST) },
+                        onSettings     = { navController.navigate(Routes.SETTINGS) }
+                    )
+                }
+
+                composable(Routes.ADD_PLAYLIST) {
+                    AddPlaylistScreen(
+                        onBack  = { navController.popBackStack() },
+                        onAdded = {
+                            navController.navigate(Routes.HOME) {
+                                popUpTo(Routes.HOME) { inclusive = true }
+                            }
+                        }
+                    )
+                }
+
+                composable(Routes.DOWNLOADS) {
+                    DownloadsScreen(onPlayOffline = { path ->
+                        navController.navigate(Routes.player(path, "Offline"))
+                    })
+                }
+
+                composable(Routes.SETTINGS) {
+                    SettingsScreen(onBack = { navController.popBackStack() })
+                }
+
+                composable(
+                    route = Routes.PLAYER,
+                    arguments = listOf(
+                        navArgument("streamUrl") { type = NavType.StringType },
+                        navArgument("title")     { type = NavType.StringType }
+                    )
+                ) { back ->
+                    PlayerScreen(
+                        streamUrl = URLDecoder.decode(back.arguments?.getString("streamUrl") ?: "", "UTF-8"),
+                        title     = URLDecoder.decode(back.arguments?.getString("title") ?: "", "UTF-8"),
+                        onBack    = { navController.popBackStack() }
+                    )
+                }
+
+                composable(Routes.PIN_GATE) {
+                    PinGateScreen(
+                        onUnlocked = { navController.popBackStack() },
+                        onDismiss  = { navController.popBackStack() }
+                    )
+                }
+            }
         }
     }
 }

@@ -1,9 +1,9 @@
-package com.iptv.player.data.api
+package com.tv700.player.data.api
 
-import com.iptv.player.data.model.XtreamCategory
-import com.iptv.player.data.model.XtreamServerInfo
-import com.iptv.player.data.model.XtreamStream
-import com.iptv.player.data.model.XtreamVodInfo
+import com.tv700.player.data.model.XtreamCategory
+import com.tv700.player.data.model.XtreamServerInfo
+import com.tv700.player.data.model.XtreamStream
+import com.tv700.player.data.model.XtreamVodInfo
 import retrofit2.http.GET
 import retrofit2.http.Query
 

@@ -1,4 +1,4 @@
-package com.iptv.player.ui.parental
+package com.tv700.player.ui.parental
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween

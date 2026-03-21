@@ -1,4 +1,4 @@
-package com.iptv.player.domain.model
+package com.tv700.player.domain.model
 
 enum class StreamType { LIVE, VOD, SERIES }
 

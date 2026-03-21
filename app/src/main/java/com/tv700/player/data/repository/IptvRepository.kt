@@ -1,9 +1,9 @@
-package com.iptv.player.data.repository
+package com.tv700.player.data.repository
 
-import com.iptv.player.data.api.XtreamApiService
-import com.iptv.player.data.m3u.M3uParser
-import com.iptv.player.data.model.XtreamStream
-import com.iptv.player.domain.model.*
+import com.tv700.player.data.api.XtreamApiService
+import com.tv700.player.data.m3u.M3uParser
+import com.tv700.player.data.model.XtreamStream
+import com.tv700.player.domain.model.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject

@@ -1,4 +1,4 @@
-package com.iptv.player.ui.player
+package com.tv700.player.ui.player
 
 import android.view.ViewGroup
 import android.widget.FrameLayout

@@ -1,12 +1,12 @@
-package com.iptv.player.data.repository
+package com.tv700.player.data.repository
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.google.gson.Gson
-import com.iptv.player.domain.model.Playlist
-import com.iptv.player.domain.model.PlaylistType
+import com.tv700.player.domain.model.Playlist
+import com.tv700.player.domain.model.PlaylistType
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map

@@ -1,6 +1,6 @@
-package com.iptv.player.di
+package com.tv700.player.di
 
-import com.iptv.player.data.api.XtreamApiService
+import com.tv700.player.data.api.XtreamApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

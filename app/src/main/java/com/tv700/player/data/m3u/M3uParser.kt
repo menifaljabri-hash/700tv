@@ -1,7 +1,7 @@
-package com.iptv.player.data.m3u
+package com.tv700.player.data.m3u
 
-import com.iptv.player.domain.model.Channel
-import com.iptv.player.domain.model.StreamType
+import com.tv700.player.domain.model.Channel
+import com.tv700.player.domain.model.StreamType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader

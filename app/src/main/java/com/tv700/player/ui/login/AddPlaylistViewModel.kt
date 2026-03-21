@@ -1,11 +1,11 @@
-package com.iptv.player.ui.login
+package com.tv700.player.ui.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.iptv.player.data.api.XtreamApiService
-import com.iptv.player.data.repository.PlaylistDataStore
-import com.iptv.player.domain.model.Playlist
-import com.iptv.player.domain.model.PlaylistType
+import com.tv700.player.data.api.XtreamApiService
+import com.tv700.player.data.repository.PlaylistDataStore
+import com.tv700.player.domain.model.Playlist
+import com.tv700.player.domain.model.PlaylistType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

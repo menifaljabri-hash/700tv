@@ -1,8 +1,8 @@
-package com.iptv.player.ui.parental
+package com.tv700.player.ui.parental
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.iptv.player.data.parental.ParentalControlManager
+import com.tv700.player.data.parental.ParentalControlManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn

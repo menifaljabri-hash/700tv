@@ -1,12 +1,12 @@
-package com.iptv.player.ui.home
+package com.tv700.player.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.iptv.player.data.repository.IptvRepository
-import com.iptv.player.domain.model.Channel
-import com.iptv.player.domain.model.Playlist
-import com.iptv.player.domain.model.Resource
-import com.iptv.player.domain.model.VodMovie
+import com.tv700.player.data.repository.IptvRepository
+import com.tv700.player.domain.model.Channel
+import com.tv700.player.domain.model.Playlist
+import com.tv700.player.domain.model.Resource
+import com.tv700.player.domain.model.VodMovie
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -15,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: IptvRepository,
-    private val playlistStore: com.iptv.player.data.repository.PlaylistDataStore
+    private val playlistStore: com.tv700.player.data.repository.PlaylistDataStore
 ) : ViewModel() {
 
     private val _liveChannels = MutableStateFlow<Resource<List<Channel>>>(Resource.Loading)

@@ -1,4 +1,4 @@
-package com.iptv.player.data.parental
+package com.tv700.player.data.parental
 
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
