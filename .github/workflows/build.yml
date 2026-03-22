@@ -5,58 +5,51 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      JAVA_HOME: /usr/lib/jvm/temurin-17-amd64
+      ANDROID_HOME: /usr/local/lib/android/sdk
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Install Android SDK
+      - name: Install Java 17
         run: |
-          # Use the pre-installed Android SDK on GitHub runners
+          wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | sudo apt-key add -
+          echo "deb https://packages.adoptium.net/artifactory/deb $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/adoptium.list
+          sudo apt-get update -q
+          sudo apt-get install -y temurin-17-jdk
+          java -version
+
+      - name: Verify pre-installed Android SDK
+        run: |
           echo "ANDROID_HOME=$ANDROID_HOME"
-          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
-          ls $ANDROID_HOME || echo "ANDROID_HOME not set"
-          ls /usr/local/lib/android/sdk || echo "no sdk at /usr/local/lib/android/sdk"
+          ls $ANDROID_HOME/cmdline-tools/latest/bin/
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
 
-      - name: Setup SDK packages
+      - name: Install SDK packages
         run: |
-          SDK_DIR=/usr/local/lib/android/sdk
-          echo "sdk.dir=$SDK_DIR" > local.properties
-          echo "ANDROID_HOME=$SDK_DIR" >> $GITHUB_ENV
-          
-          # Accept licenses
-          yes | $SDK_DIR/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          
-          # Install needed packages
-          $SDK_DIR/cmdline-tools/latest/bin/sdkmanager \
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
             "platforms;android-34" \
             "build-tools;34.0.0"
 
-      - name: Setup Gradle Wrapper
+      - name: Download Gradle wrapper JAR
         run: |
           mkdir -p gradle/wrapper
-          # Download gradle wrapper jar
           wget -q "https://services.gradle.org/distributions/gradle-8.4-bin.zip" -O /tmp/gradle.zip
           unzip -p /tmp/gradle.zip gradle-8.4/lib/gradle-wrapper.jar > gradle/wrapper/gradle-wrapper.jar
           chmod +x gradlew
-          ls -lh gradle/wrapper/
+          echo "JAR size: $(wc -c < gradle/wrapper/gradle-wrapper.jar)"
 
       - name: Build Debug APK
         run: |
-          export ANDROID_HOME=/usr/local/lib/android/sdk
-          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1
+          export JAVA_HOME=/usr/lib/jvm/temurin-17-amd64
+          export PATH=$JAVA_HOME/bin:$PATH
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
