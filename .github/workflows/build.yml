@@ -7,53 +7,55 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
 
     steps:
-      - name: Clone repo
-        run: |
-          git clone https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git .
-          git checkout ${{ github.sha }}
-
-      - name: Build APK
+      - name: Clone and Build
         run: |
           set -e
+
+          # Clone repo
+          git clone https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git /home/runner/work/app
+          cd /home/runner/work/app
+          git checkout ${{ github.sha }}
+
+          # Java check
           java -version
 
+          # Android SDK
           SDK=/usr/local/lib/android/sdk
           echo "sdk.dir=$SDK" > local.properties
           export ANDROID_HOME=$SDK
 
+          # Licenses + packages
           yes | $SDK/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
           $SDK/cmdline-tools/latest/bin/sdkmanager "platforms;android-34" "build-tools;34.0.0"
 
+          # Gradle wrapper
           mkdir -p gradle/wrapper
           wget -q https://services.gradle.org/distributions/gradle-8.4-bin.zip -O /tmp/g.zip
           unzip -p /tmp/g.zip gradle-8.4/lib/gradle-wrapper.jar > gradle/wrapper/gradle-wrapper.jar
           chmod +x gradlew
 
+          # Build
           ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: Upload APK to GitHub Release
-        run: |
+          # Upload to release
           APK=$(find app/build/outputs/apk/debug -name "*.apk" | head -1)
-          echo "APK found: $APK"
+          echo "APK: $APK"
 
-          # Create a release via GitHub API
-          RELEASE=$(curl -s -X POST \
+          RELEASE=$(curl -sf -X POST \
             -H "Authorization: token ${{ github.token }}" \
             -H "Content-Type: application/json" \
-            -d "{\"tag_name\":\"build-${{ github.run_number }}\",\"name\":\"700TV Build #${{ github.run_number }}\",\"body\":\"Auto build\",\"draft\":false,\"prerelease\":true}" \
+            -d "{\"tag_name\":\"v${{ github.run_number }}\",\"name\":\"700TV Build ${{ github.run_number }}\",\"prerelease\":true}" \
             "https://api.github.com/repos/${{ github.repository }}/releases")
 
-          UPLOAD_URL=$(echo $RELEASE | python3 -c "import sys,json; print(json.load(sys.stdin)['upload_url'])" | sed 's/{?name,label}//')
-          echo "Upload URL: $UPLOAD_URL"
+          UPLOAD_URL=$(echo "$RELEASE" | python3 -c "import sys,json; print(json.load(sys.stdin)['upload_url'].split('{')[0])")
 
-          # Upload APK to release
-          curl -s -X POST \
+          curl -sf -X POST \
             -H "Authorization: token ${{ github.token }}" \
             -H "Content-Type: application/vnd.android.package-archive" \
             --data-binary @"$APK" \
             "${UPLOAD_URL}?name=700TV-debug.apk"
 
-          echo "✅ APK uploaded to GitHub Releases!"
+          echo "Done! Check Releases tab for APK"
