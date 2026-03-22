@@ -7,53 +7,40 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    env:
-      JAVA_HOME: /usr/lib/jvm/temurin-17-amd64
-      ANDROID_HOME: /usr/local/lib/android/sdk
+    runs-on: ubuntu-22.04
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Install Java 17
+      - name: Setup and Build
         run: |
-          wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | sudo apt-key add -
-          echo "deb https://packages.adoptium.net/artifactory/deb $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/adoptium.list
-          sudo apt-get update -q
-          sudo apt-get install -y temurin-17-jdk
+          set -e
+          
+          # Java 17 is pre-installed on ubuntu-22.04
           java -version
-
-      - name: Verify pre-installed Android SDK
-        run: |
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          ls $ANDROID_HOME/cmdline-tools/latest/bin/
-          echo "sdk.dir=$ANDROID_HOME" > local.properties
-
-      - name: Install SDK packages
-        run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
-            "platforms;android-34" \
-            "build-tools;34.0.0"
-
-      - name: Download Gradle wrapper JAR
-        run: |
+          
+          # Android SDK is pre-installed
+          SDK=/usr/local/lib/android/sdk
+          echo "sdk.dir=$SDK" > local.properties
+          
+          # Accept licenses
+          yes | $SDK/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || true
+          
+          # Install required packages
+          $SDK/cmdline-tools/latest/bin/sdkmanager "platforms;android-34" "build-tools;34.0.0"
+          
+          # Get Gradle wrapper JAR
           mkdir -p gradle/wrapper
-          wget -q "https://services.gradle.org/distributions/gradle-8.4-bin.zip" -O /tmp/gradle.zip
-          unzip -p /tmp/gradle.zip gradle-8.4/lib/gradle-wrapper.jar > gradle/wrapper/gradle-wrapper.jar
+          wget -q https://services.gradle.org/distributions/gradle-8.4-bin.zip -O /tmp/g.zip
+          unzip -p /tmp/g.zip gradle-8.4/lib/gradle-wrapper.jar > gradle/wrapper/gradle-wrapper.jar
           chmod +x gradlew
-          echo "JAR size: $(wc -c < gradle/wrapper/gradle-wrapper.jar)"
+          
+          # Build
+          export ANDROID_HOME=$SDK
+          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1
 
-      - name: Build Debug APK
-        run: |
-          export JAVA_HOME=/usr/lib/jvm/temurin-17-amd64
-          export PATH=$JAVA_HOME/bin:$PATH
-          ./gradlew assembleDebug --no-daemon --stacktrace
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
+        if: success()
         with:
-          name: 700TV-debug-apk
+          name: 700TV-apk
           path: app/build/outputs/apk/debug/*.apk
-          retention-days: 30
