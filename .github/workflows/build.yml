@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Clone repo
         run: |
-          git clone https://github.com/${{ github.repository }}.git .
+          git clone https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git .
           git checkout ${{ github.sha }}
 
       - name: Build APK
