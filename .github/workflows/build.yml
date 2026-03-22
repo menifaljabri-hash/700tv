@@ -8,38 +8,39 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Setup and Build
+      - name: Build APK
         run: |
           set -e
-          
-          # Java 17 is pre-installed on ubuntu-22.04
+
+          # Java 17 (pre-installed on ubuntu-22.04)
+          export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
           java -version
-          
-          # Android SDK is pre-installed
+
+          # Android SDK (pre-installed on GitHub runners)
           SDK=/usr/local/lib/android/sdk
           echo "sdk.dir=$SDK" > local.properties
-          
-          # Accept licenses
-          yes | $SDK/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || true
-          
-          # Install required packages
-          $SDK/cmdline-tools/latest/bin/sdkmanager "platforms;android-34" "build-tools;34.0.0"
-          
-          # Get Gradle wrapper JAR
+          export ANDROID_HOME=$SDK
+
+          # Accept licenses silently
+          yes | $SDK/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
+          $SDK/cmdline-tools/latest/bin/sdkmanager "platforms;android-34" "build-tools;34.0.0" > /dev/null 2>&1
+
+          # Gradle wrapper JAR
           mkdir -p gradle/wrapper
           wget -q https://services.gradle.org/distributions/gradle-8.4-bin.zip -O /tmp/g.zip
           unzip -p /tmp/g.zip gradle-8.4/lib/gradle-wrapper.jar > gradle/wrapper/gradle-wrapper.jar
           chmod +x gradlew
-          
-          # Build
-          export ANDROID_HOME=$SDK
-          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1
 
-      - uses: actions/upload-artifact@v4
+          # Build
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - uses: actions/upload-artifact@v3
         if: success()
         with:
           name: 700TV-apk
