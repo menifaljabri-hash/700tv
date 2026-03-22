@@ -34,9 +34,26 @@ jobs:
 
           ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        if: success()
-        with:
-          name: 700TV-apk
-          path: app/build/outputs/apk/debug/*.apk
+      - name: Upload APK to GitHub Release
+        run: |
+          APK=$(find app/build/outputs/apk/debug -name "*.apk" | head -1)
+          echo "APK found: $APK"
+
+          # Create a release via GitHub API
+          RELEASE=$(curl -s -X POST \
+            -H "Authorization: token ${{ github.token }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"tag_name\":\"build-${{ github.run_number }}\",\"name\":\"700TV Build #${{ github.run_number }}\",\"body\":\"Auto build\",\"draft\":false,\"prerelease\":true}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases")
+
+          UPLOAD_URL=$(echo $RELEASE | python3 -c "import sys,json; print(json.load(sys.stdin)['upload_url'])" | sed 's/{?name,label}//')
+          echo "Upload URL: $UPLOAD_URL"
+
+          # Upload APK to release
+          curl -s -X POST \
+            -H "Authorization: token ${{ github.token }}" \
+            -H "Content-Type: application/vnd.android.package-archive" \
+            --data-binary @"$APK" \
+            "${UPLOAD_URL}?name=700TV-debug.apk"
+
+          echo "✅ APK uploaded to GitHub Releases!"
